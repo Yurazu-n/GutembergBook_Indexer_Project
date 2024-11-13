@@ -5,10 +5,14 @@ import org.example.model.BookAllocation;
 import org.example.model.Position;
 import org.example.model.Word;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IndexerControl implements BookIndexer {
 
@@ -26,12 +30,11 @@ public class IndexerControl implements BookIndexer {
 
     @Override
     public void indexBook(int bookId) throws IOException {
-        String bookFilePath = "datalake/books/" + bookId + ".txt";
+        String bookFilePath = "C:/Users/OSMEL/Documents/datalake/books/" + bookId + ".txt";
 
         List<String> lines = Files.readAllLines(Paths.get(bookFilePath));
         Map<String, Word> wordMap = new HashMap<>();
 
-        // Process each line in the book file
         for (int lineNumber = 0; lineNumber < lines.size(); lineNumber++) {
             String line = lines.get(lineNumber);
             String[] words = line.split("\\s+");
@@ -49,7 +52,6 @@ public class IndexerControl implements BookIndexer {
                             .computeIfAbsent(bookKey, k -> new BookAllocation(0, new ArrayList<>()))
                             .getPositions().add(pos);
 
-                    // Update times and total count
                     wordMap.get(lemma).getAllocations().get(bookKey).setTimes(
                             wordMap.get(lemma).getAllocations().get(bookKey).getTimes() + 1);
                     wordMap.get(lemma).setTotal(wordMap.get(lemma).getTotal() + 1);
@@ -57,7 +59,6 @@ public class IndexerControl implements BookIndexer {
             }
         }
 
-        // Save each word in the appropriate JSON file
         for (String lemma : wordMap.keySet()) {
             saveOrUpdateWord(wordMap.get(lemma));
         }
@@ -96,11 +97,28 @@ public class IndexerControl implements BookIndexer {
         }
     }
 
-    public void executeIndexing(String lastBookPath) throws IOException {
-        int lastBookId = lastBookManager.readLastProcessedBookId(lastBookPath);
-        for (int bookId = lastBookId + 1; ; bookId++) {
-            indexBook(bookId);
-            lastBookManager.updateLastProcessedBookId(lastBookPath, bookId);
+    public void executeIndexing() throws IOException {
+        String lastBookPath = "resources/lastBookId.txt";
+        int lastProcessedBookId = lastBookManager.readLastProcessedBookId(lastBookPath);
+
+        Path booksDirectory = Paths.get("C:/Users/OSMEL/Documents/datalake/books");
+        try (Stream<Path> bookFiles = Files.list(booksDirectory)) {
+            bookFiles
+                    .filter(Files::isRegularFile) // Solo archivos regulares
+                    .filter(path -> path.getFileName().toString().matches("\\d+\\.txt")) // Archivos con nombres numéricos
+                    .sorted(Comparator.comparingInt(path -> Integer.parseInt(path.getFileName().toString().replace(".txt", "")))) // Ordenar por número
+                    .filter(path -> Integer.parseInt(path.getFileName().toString().replace(".txt", "")) > lastProcessedBookId) // Filtrar solo los que no se han procesado
+                    .forEach(path -> {
+                        try {
+                            int bookId = Integer.parseInt(path.getFileName().toString().replace(".txt", ""));
+                            indexBook(bookId); // Indexar el libro
+                            lastBookManager.updateLastProcessedBookId(lastBookPath, bookId); // Actualizar el ID del último libro procesado
+                        } catch (IOException e) {
+                            System.err.println("Error indexing book: " + path.getFileName());
+                            e.printStackTrace();
+                        }
+                    });
         }
     }
 }
+
