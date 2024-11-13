@@ -1,9 +1,5 @@
-package org.example;
+package org.example.control;
 
-import org.example.control.BookManagerControl;
-import org.example.control.JsonFileManagerControl;
-import org.example.control.WordCleanerControl;
-import org.example.control.WordLemmatizerControl;
 import org.example.interfaces.LastBookManager;
 import org.example.interfaces.JsonFileManager;
 import org.example.interfaces.WordCleaner;
