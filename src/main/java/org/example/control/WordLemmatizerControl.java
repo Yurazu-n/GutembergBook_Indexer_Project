@@ -5,7 +5,6 @@ import org.example.interfaces.WordLemmatizer;
 public class WordLemmatizerControl implements WordLemmatizer {
     @Override
     public String lemmatize(String word){
-
-        return word;
+        return word.toLowerCase();
     }
 }
