@@ -8,9 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class FileBookManagerControl implements LastBookManager {
+public class BookManagerControl implements LastBookManager {
 
-    public FileBookManagerControl() {
+    public BookManagerControl() {
     }
 
     @Override
