@@ -5,8 +5,6 @@ import org.example.interfaces.WordIndexer;
 
 public class IndexerControl implements WordIndexer {
 
-    private
-
     public IndexerControl() {
         FileBookManagerControl fileManager = new FileBookManagerControl();
         JsonFileManagerControl jsonFileManager = new JsonFileManagerControl();
