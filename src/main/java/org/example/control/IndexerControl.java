@@ -1,9 +1,6 @@
 package org.example.control;
 
-import org.example.interfaces.LastBookManager;
-import org.example.interfaces.JsonFileManager;
-import org.example.interfaces.WordCleaner;
-import org.example.interfaces.WordLemmatizer;
+import org.example.interfaces.*;
 import org.example.model.BookAllocation;
 import org.example.model.Position;
 import org.example.model.Word;
@@ -13,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class IndexerControl {
+public class IndexerControl implements BookIndexer {
 
     private final LastBookManager lastBookManager;
     private final JsonFileManager jsonFileManager;
@@ -27,6 +24,7 @@ public class IndexerControl {
         this.wordLemmatizer = new WordLemmatizerControl();
     }
 
+    @Override
     public void indexBook(int bookId) throws IOException {
         String bookFilePath = "datalake/books/" + bookId + ".txt";
 
