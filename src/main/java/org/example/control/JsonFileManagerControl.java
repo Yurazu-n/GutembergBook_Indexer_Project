@@ -1,27 +1,31 @@
 package org.example.control;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.example.interfaces.JsonFileManager;
 import org.example.model.Word;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class JsonFileManagerControl implements JsonFileManager {
 
-    private final ObjectMapper objectMapper;
+    private final Gson gson;
 
     public JsonFileManagerControl() {
-        this.objectMapper = new ObjectMapper();
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     @Override
     public Word readJson(String filePath) throws IOException {
         File file = new File(filePath);
 
-        // Check if the file exists; if not, return null
         if (file.exists()) {
-            return objectMapper.readValue(file, Word.class);
+            try (FileReader reader = new FileReader(file)) {
+                return gson.fromJson(reader, Word.class);
+            }
         }
         return null;
     }
@@ -30,7 +34,8 @@ public class JsonFileManagerControl implements JsonFileManager {
     public void writeJson(String filePath, Word word) throws IOException {
         File file = new File(filePath);
 
-        // Write the Word object to the JSON file with pretty-printing
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, word);
+        try (FileWriter writer = new FileWriter(file)) {
+            gson.toJson(word, writer);
+        }
     }
 }
