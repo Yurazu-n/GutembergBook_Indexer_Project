@@ -1,6 +1,6 @@
 package org.example.control;
 
-import org.example.interfaces.FileManager;
+import org.example.interfaces.LastBookManager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class FileBookManagerControl implements FileManager {
+public class FileBookManagerControl implements LastBookManager {
 
     public FileBookManagerControl() {
     }
